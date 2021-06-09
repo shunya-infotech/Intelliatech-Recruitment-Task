@@ -41,7 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (image.getSize() > (2 * 2048 * 2048))
             throw new FileSizeExceedException("File must be less then 2 MB");
 
-        DepartmentModel department = departmentRepository.getById(departmentId);
+        DepartmentModel department = departmentRepository.findById(departmentId).get();
         if( department == null)
              throw new EntityNotFoundException("Department not found with given id");
 

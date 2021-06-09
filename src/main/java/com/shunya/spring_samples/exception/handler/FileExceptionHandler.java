@@ -19,12 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 public class FileExceptionHandler {
 
     private final ResponseWrapper<?> exceptionResponse;
+    private final GlobalExceptionHandler globalExceptionHandler;
     
     @ExceptionHandler(FileSizeExceedException.class)
     public ResponseEntity<?> handleFileSizeExceedException(Exception exception, WebRequest webRequest){
 
         log.error("exception at : " + webRequest.getDescription(false));
-        setExceptionResponse(exception, webRequest);
+        globalExceptionHandler.setExceptionResponse(exception, webRequest);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
     }
 
@@ -32,14 +33,7 @@ public class FileExceptionHandler {
     public ResponseEntity<?> handleFileNotAnImageException(Exception exception, WebRequest webRequest){
 
         log.error("exception at : " + webRequest.getDescription(false));
-        setExceptionResponse(exception, webRequest);
+        globalExceptionHandler.setExceptionResponse(exception, webRequest);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
-    }
-
-    private void setExceptionResponse(Exception exception, WebRequest webRequest){
-        
-        exceptionResponse.setResponseException(null,
-                exception.getMessage() + ", Exception at " + webRequest.getDescription(false),
-                exception.getClass().getSimpleName());
     }
 }

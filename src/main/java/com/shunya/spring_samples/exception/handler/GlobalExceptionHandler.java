@@ -1,5 +1,6 @@
 package com.shunya.spring_samples.exception.handler;
 
+import com.shunya.spring_samples.exception.EntityNotFoundException;
 import com.shunya.spring_samples.util.response.ResponseWrapper;
 
 import org.springframework.core.Ordered;
@@ -21,14 +22,26 @@ public class GlobalExceptionHandler {
 
     private final ResponseWrapper<?> exceptionResponse;
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> exception(Exception exception, WebRequest webRequest) {
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> handleEntityNotFoundException(Exception exception, WebRequest webRequest){
 
         log.error("exception at : " + webRequest.getDescription(false));
+        setExceptionResponse(exception, webRequest);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+    }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleException(Exception exception, WebRequest webRequest) {
+
+        log.error("exception at : " + webRequest.getDescription(false));
+        setExceptionResponse(exception, webRequest);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+    }
+
+    public void setExceptionResponse(Exception exception, WebRequest webRequest){
+        
         exceptionResponse.setResponseException(null,
                 exception.getMessage() + ", Exception at " + webRequest.getDescription(false),
-                exception.getClass().toString());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
+                exception.getClass().getSimpleName());
     }
 }

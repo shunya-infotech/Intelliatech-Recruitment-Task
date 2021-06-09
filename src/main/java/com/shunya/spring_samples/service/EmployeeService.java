@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface EmployeeService {
 
-    public EmployeeModel createEmployee(EmployeeModel employee, MultipartFile image) throws IOException;
+    public EmployeeModel createEmployee(Short departmentId, EmployeeModel employee, MultipartFile image) throws IOException;
 
     public List<EmployeeModel> getAllEmployeesForCity(String city);
 

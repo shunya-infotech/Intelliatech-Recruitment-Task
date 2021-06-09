@@ -8,9 +8,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
+
 import com.shunya.spring_samples.exception.FileNotAnImageException;
 import com.shunya.spring_samples.exception.FileSizeExceedException;
+import com.shunya.spring_samples.model.DepartmentModel;
 import com.shunya.spring_samples.model.EmployeeModel;
+import com.shunya.spring_samples.repository.DepartmentRepository;
 import com.shunya.spring_samples.repository.EmployeeRepository;
 import com.shunya.spring_samples.service.EmployeeService;
 
@@ -26,15 +30,22 @@ import lombok.extern.slf4j.Slf4j;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Override
-    public EmployeeModel createEmployee(EmployeeModel employee, MultipartFile image) throws IOException {
+    public EmployeeModel createEmployee(Short departmentId, EmployeeModel employee, MultipartFile image) throws IOException {
 
         if (!(image.getContentType().split("/")[0]).equals("image"))
             throw new FileNotAnImageException("The file is not an image");
 
         if (image.getSize() > (2 * 2048 * 2048))
             throw new FileSizeExceedException("File must be less then 2 MB");
+
+        DepartmentModel department = departmentRepository.getById(departmentId);
+        if( department == null)
+             throw new EntityNotFoundException("Department not found with given id");
+
+        employee.setDepartment(department);
 
         /*
          * more checks need to be added here for employee and appropriate exceptions
@@ -47,7 +58,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (!imageDir.exists())
             imageDir.mkdirs();
 
-        String filename = imageDir.getAbsolutePath() + "/profile-image."
+        String filename = imageDir.getAbsolutePath() + "/profile-image"
                 + image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf("."));
 
         try (InputStream is = image.getInputStream()) {

@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import com.shunya.spring_samples.model.EmployeeModel;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +22,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeModel, Long> {
             + " and department.name = :departmentName")
     public List<EmployeeModel> getAllEmployeesForDepartment(String departmentName);
 
-    @Query(nativeQuery = true, value = "delete from employee where department_id = :departmentId")
-    public void deleteAllEmployeesForDepartment(Integer departmentId);
+    @Modifying
+    @Query(nativeQuery = true, value = "delete from employee where department_id = ?")
+    public Integer deleteAllEmployeesForDepartment(Integer departmentId);
 }
